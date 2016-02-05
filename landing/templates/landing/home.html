@@ -14,6 +14,7 @@
         {% endif %}
       {% else %}
         You can <a href="{% provider_login_url "fxa" %}">sign in with your Firefox Account</a>.
+        <div class="control-lock"> Or <a href="{% provider_login_url "untappd" %}">Untappd</a>!</div>
       {% endif %}
     </p>
 {% endblock %}

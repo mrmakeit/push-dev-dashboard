@@ -85,6 +85,29 @@ OAuth client app.
 .. _Add a django-allauth social app: http://127.0.0.1:8000/admin/socialaccount/socialapp/add/
 .. _Log out of the admin account: http://127.0.0.1:8000/admin/logout/
 
+Enable Untappd Auth
+----------------------------
+
+To enable Untappd authentication, you can use our local development
+OAuth client app.
+
+#. `Add a django-allauth social app`_ for Untappd (Log in as the
+   superuser account you created):
+
+   * Provider: Untappd
+   * Name: untappd
+   * Client id: 5359D40D5F4820C033ADBEC674CFA6DE4C598E1D
+   * Secret key: BD520CB9092CF28D6AA903058405886AA28719AA
+   * Sites: example.com -> Chosen sites
+
+#. `Log out of the admin account`_
+
+#. Enter the `Konami Code`_ (end with enter instead of select start) at http://127.0.0.1:8000, and login with an Untappd account
+
+.. _Konami Code: https://en.wikipedia.org/wiki/Konami_Code
+.. _Add a django-allauth social app: http://127.0.0.1:8000/admin/socialaccount/socialapp/add/
+.. _Log out of the admin account: http://127.0.0.1:8000/admin/logout/
+
 
 Run the Tests
 -------------

@@ -7,5 +7,6 @@
         <p>Your profile</p>
     {% else %}
         <a href="{% provider_login_url "fxa" %}">Sign in with your Firefox Account</a>
+        <div id="untappd"> Or <a href="{% provider_login_url "untappd" %}">Untappd</a>!</div>
     {% endif %}
 {% endblock %}

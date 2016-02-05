@@ -1,10 +1,9 @@
 Django==1.9.2
 dj-database-url==0.4.0
-django-allauth==0.24.1
+-e git://github.com/pennersr/django-allauth.git@6fdade4f65fb86f8d085c68fb3950799e7cf9e05#egg=django_allauth-origin/HEAD
 djangorestframework==3.3.2
 dnslib==0.9.6
 gunicorn==19.4.5
 newrelic==2.60.0.46
-psycopg2==2.6.1
 python-decouple==3.0
 whitenoise==2.0.6
