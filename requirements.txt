@@ -7,3 +7,4 @@ gunicorn==19.4.5
 newrelic==2.60.0.46
 python-decouple==3.0
 whitenoise==2.0.6
+psycopg2==2.6.1
