@@ -1,33 +1,58 @@
-h1 a:link, h1 a:visited, h1 a:hover, h1 a:active {
-    color: #000;
-    text-decoration: none;
+html {
+    min-height: 100%;
 }
 
-/* Vertically center the .auth box */
-#push-dashboard header {
-    display: flex;
-    align-items: center;
-}
-#push-dashboard header * {
-    margin-bottom: 0;
-}
-header {
-    margin-bottom: 2rem;
+body {
+    font-family: "Fira Sans";
+    margin: 0 0 100px;
 }
 
-.auth ul {
-    float: right;
-    list-style: none;
+main {
+    margin: 20px auto;
 }
 
-.auth li {
+section {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.top-bar {
+    background: #1e1e21;
+    background-image: -webkit-radial-gradient(top left,ellipse farthest-side,#00549e 0,rgba(0,0,0,0) 100%);
+    background-image: radial-gradient(ellipse farthest-side at top left,#00549e 0,rgba(0,0,0,0) 100%);
+    background-size: 100% 500px;
+    background-repeat: no-repeat;
+    background-position: top center;
+}
+
+.top-bar a {
+    color: #fff;
+}
+
+.top-bar-title a::before {
+    background-image: url('../img/firefox-logo.png');
+    background-size: 38px;
+    content: ' ';
+    display: block;
     float: left;
+    height: 38px;
+    margin-right: 10px;
+    width: 38px;
 }
 
-.auth li + li {
-    border-left: 1px solid #000;
-    margin-left: 5px;
-    padding-left: 5px;
+.top-bar-title a {
+    font-weight: bold;
+    position: relative;
+    top: 6px;
+}
+
+.breadcrumbs a {
+    color: #00549E;
+}
+
+.button {
+    background-color: #00549E;
+    margin: 0;
 }
 
 .control-lock {

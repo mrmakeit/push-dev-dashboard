@@ -14,20 +14,27 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url, include
+from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
 
-from landing.views import Home, Profile
+import dashboard.views as dashboard_views
+
+handler403 = dashboard_views.PermissionDenied.as_view()
+handler500 = dashboard_views.InternalServerError.as_view()
 
 urlpatterns = [
-    # our app urls
-    url(r'^$', Home.as_view(), name='home'),
-    url(r'^accounts/profile/$', Profile.as_view(), name='profile'),
-    url(r'^api/docs/', include('rest_framework_swagger.urls')),
-    url(r'^api/v1/', include('api.urls')),
-
     # 3rd-party app urls
     url(r'^accounts/', include('allauth.urls')),
+    url(r'^api/docs/', include('rest_framework_swagger.urls')),
 
-    #django urls
+    # django urls
     url(r'^admin/', admin.site.urls),
 ]
+
+urlpatterns += i18n_patterns(
+    # our app urls
+    url(r'^$', dashboard_views.Home.as_view(), name='home'),
+    url(r'^api/v1/', include('api.urls')),
+    url(r'^push/', include('push.urls')),
+    url(r'^accounts/login/$', dashboard_views.Login.as_view(), name='login'),
+)

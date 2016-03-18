@@ -13,7 +13,12 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import os
 
 from decouple import config
+
 import dj_database_url
+
+
+def path(*parts):
+    return os.path.join(BASE_DIR, *parts)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -46,21 +51,35 @@ INSTALLED_APPS = [
     'pipeline',
     'rest_framework',
     'rest_framework_swagger',
+    'waffle',
 
+    'dashboard',
     'dashboard.socialaccount.providers.fxa',
-    'landing',
-    'domains'
+    'domains',
+    'push'
 ]
+
+if DEBUG:
+    try:
+        import debug_toolbar
+        assert debug_toolbar
+        INSTALLED_APPS += [
+            'debug_toolbar'
+        ]
+    except:
+        pass
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'waffle.middleware.WaffleMiddleware',
 ]
 
 ROOT_URLCONF = 'dashboard.urls'
@@ -68,7 +87,7 @@ ROOT_URLCONF = 'dashboard.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [path('templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -76,6 +95,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                'dashboard.context_processors.conf_settings'
             ],
         },
     },
@@ -101,6 +122,9 @@ DATABASES['default']['CONN_MAX_AGE'] = 500
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
+LOCALE_PATHS = [
+    path('locale',),
+]
 
 TIME_ZONE = 'UTC'
 
@@ -115,16 +139,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_ROOT = 'staticfiles'
+STATIC_ROOT = path('staticfiles',)
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-        os.path.join(PROJECT_DIR, 'static'),
+    os.path.join(PROJECT_DIR, 'static'),
+    path('push', 'static'),
 )
 
-# Simplified static file serving.
-# https://warehouse.python.org/project/whitenoise/
-STATICFILES_STORAGE = 'pipeline.storage.PipelineStorage'
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -135,23 +158,43 @@ STATICFILES_FINDERS = (
 # django-pipeline
 PIPELINE = {
     'STYLESHEETS': {
-        'main': {
+        'dashboard': {
             'source_filenames': (
-                'lib/skeleton/css/normalize.css',
-                'lib/skeleton/css/skeleton.css',
+                # Global
                 'css/main.css',
+                'css/elements.css',
+                'css/forms.css',
+                'css/navigation.css',
+
+                # Login page
+                'css/login.css',
+
+                # Push applicaton landing page
+                'css/landing.css',
+
+                # Push application listing page
+                'css/list.css',
+
+                # Push application details page
+                'css/details.css',
             ),
-            'output_filename': 'css/main.css',
+            'output_filename': 'css/dashboard.css',
         },
     },
     'JAVASCRIPT': {
-        'main': {
+        'dashboard': {
             'source_filenames': (
-                'js/main.js',
+                # Global
+                'js/analytics.js',
+                'js/sign_in.js',
+                'js/konami.js',
+
+                # Push application listing page
+                'js/add-push-application.js',
             ),
-            'output_filename': 'js/main.js',
-        },
-    },
+            'output_filename': 'js/dashboard.js'
+        }
+    }
 }
 
 # django-allauth
@@ -163,31 +206,21 @@ AUTHENTICATION_BACKENDS = (
 
 SOCIALACCOUNT_PROVIDERS = {
     'fxa': {
-        'OAUTH_ENDPOINT': config('FXA_OAUTH_ENDPOINT',
-                                 'https://oauth-stable.dev.lcip.org/v1/'),
-        'PROFILE_ENDPOINT': config('FXA_PROFILE_ENDPOINT',
-                                   'https://stable.dev.lcip.org/profile/v1/profile')
-   }
+        'OAUTH_ENDPOINT': config(
+            'FXA_OAUTH_ENDPOINT',
+            'https://oauth-stable.dev.lcip.org/v1/'
+        ),
+        'PROFILE_ENDPOINT': config(
+            'FXA_PROFILE_ENDPOINT',
+            'https://stable.dev.lcip.org/profile/v1/profile'
+        )
+    }
 }
-# https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
 
 ACCOUNT_EMAIL_VERIFICATION = config('ACCOUNT_EMAIL_VERIFICATION',
                                     default='none')
+ACCOUNT_LOGOUT_ON_GET = True
+LOGIN_REDIRECT_URL = 'home'
 
 # djangorestframework
 REST_FRAMEWORK = {
@@ -197,3 +230,10 @@ REST_FRAMEWORK = {
 }
 
 SITE_ID = 1
+
+# TODO: Set real stage/prod AUTOPUSH_KEYS_ENDPOINT
+PUSH_MESSAGES_API_ENDPOINT = config('PUSH_MESSAGES_API_ENDPOINT', None)
+PUSH_MESSAGES_API_TIMEOUT = 3.05
+
+# Google Analytics
+GOOGLE_ANALYTICS_ACCOUNT = config('GOOGLE_ANALYTICS_ACCOUNT', None)

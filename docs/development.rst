@@ -4,13 +4,15 @@ Development
 Requirements
 ------------
 
-* `python`_
-* `virtualenv`_
-* `bower`_
+* `postgres`_ for database
+* `python`_ 2.7, `virtualenv`_, `pip`_ for app server
+* `npm`_ for front-end testing
 
+.. _postgres: https://wiki.postgresql.org/wiki/Detailed_installation_guides
 .. _python: https://www.python.org/
 .. _virtualenv: http://docs.python-guide.org/en/latest/dev/virtualenvs/
-.. _bower: http://bower.io/
+.. _pip: https://pip.readthedocs.org/en/latest/
+.. _npm: https://www.npmjs.com/
 
 
 Install Locally
@@ -18,7 +20,7 @@ Install Locally
 
 #. `Clone`_ and change to the directory::
 
-    git clone git@github.com:groovecoder/push-dev-dashboard.git
+    git clone git@github.com:mozilla-services/push-dev-dashboard.git
     cd push-dev-dashboard
 
 #. Create and activate a `virtual environment`_ (Can also use `virtualenvwrapper`_)::
@@ -28,8 +30,7 @@ Install Locally
 
 #. `Install requirements`_::
 
-    pip install -r requirements.txt
-    bower install
+    pip install -r requirements-dev.txt
 
 #. Source the ``.env`` file to set environment config vars (Can also use `autoenv`_)::
 
@@ -45,7 +46,8 @@ Install Locally
 
 .. _Clone: http://git-scm.com/book/en/Git-Basics-Getting-a-Git-Repository#Cloning-an-Existing-Repository
 .. _Install requirements: http://pip.readthedocs.org/en/latest/user_guide.html#requirements-files
-.. _Create a superuser: https://docs.djangoproject.com/en/1.7/ref/django-admin/#django-admin-createsuperuser
+.. _Migrate: https://docs.djangoproject.com/en/1.9/topics/migrations/
+.. _Create a superuser: https://docs.djangoproject.com/en/1.9/ref/django-admin/#django-admin-createsuperuser
 
 
 Run it
@@ -88,16 +90,28 @@ OAuth client app.
 .. _Add a django-allauth social app: http://127.0.0.1:8000/admin/socialaccount/socialapp/add/
 .. _Log out of the admin account: http://127.0.0.1:8000/admin/logout/
 
+Use production assets
+---------------------
+
+Front-end assets are compressed on production. To test these compressed assets
+locally, follow these steps:
+
+#. In .env, set ``DJANGO_DEBUG`` to ``False``
+#. Stop ``runserver`` if it's already running
+#. Run ``python manage.py collectstatic``
+#. Run ``python manage.py runserver``
 
 Run the Tests
 -------------
 #. Install test requirements::
 
-    pip install requirements-test.txt
+    pip install -r requirements-test.txt
+    npm install
 
-#. Running the test suite::
+#. Run the test suites::
 
     python manage.py test
+    npm test
 
 
 Working on Docs
@@ -116,12 +130,28 @@ Read the beautiful docs::
     open html/index.html
 
 
+Adding a Translation
+--------------------
+#. Make the ``{locale}`` directory for the new locale::
+
+    mkdir locale/{locale}
+
+#. Run ``makemessages`` to make a ``django.po`` file for it::
+
+    python manage.py makemessages {locale}
+
+#. Add the new directory to git::
+
+    git add locale/{locale}
+    git commit -m "Adding {locale} locale"
+
+
 What to work on
 ---------------
 
 We have `Issues`_.
 
-.. _Issues: https://github.com/groovecoder/push-dev-dashboard/issues
+.. _Issues: https://github.com/mozilla-services/push-dev-dashboard/issues
 
 .. _virtual environment: http://docs.python-guide.org/en/latest/dev/virtualenvs/
 .. _virtualenvwrapper: https://pypi.python.org/pypi/virtualenvwrapper

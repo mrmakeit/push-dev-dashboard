@@ -1,0 +1,26 @@
+/* Override the dropdown menu arrow to make it white */
+#main-navigation .is-dropdown-submenu-parent > a::after {
+    border-color: #fff transparent transparent;
+}
+
+#main-navigation {
+    float: left;
+    margin-right: 20px;
+}
+
+#account-management {
+    float: right;
+}
+
+#account-management .fa-firefox {
+    margin-right: 0;
+    vertical-align: baseline;
+}
+
+.top-bar nav ul {
+    background-color: transparent;
+}
+
+.top-bar nav ul.submenu {
+    background-color: #00549E;
+}
